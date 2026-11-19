@@ -1,0 +1,40 @@
+# Local test only: the same services and variables as the Railway template.
+services:
+  postgres:
+    build: ./postgres
+    environment:
+      POSTGRES_PASSWORD: localtestpg
+    volumes: ["pg:/var/lib/postgresql/data"]
+  rabbitmq:
+    build: ./rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_PASS: localtestmq
+    volumes: ["mq:/var/lib/rabbitmq"]
+  redis:
+    image: redis:8.2.1
+    command: ["redis-server", "--requirepass", "localtestredis", "--save", "60", "1", "--dir", "/data"]
+    volumes: ["redis:/data"]
+  memcached:
+    build: ./memcached
+    environment:
+      MEMCACHED_PASSWORD: localtestmc
+  zulip:
+    build: ./zulip
+    ports: ["8080:80"]
+    environment:
+      SETTING_EXTERNAL_HOST: localhost:8080
+      SETTING_ZULIP_ADMINISTRATOR: owner@example.com
+      SETTING_REMOTE_POSTGRES_HOST: postgres
+      SETTING_RABBITMQ_HOST: rabbitmq
+      SETTING_REDIS_HOST: redis
+      SETTING_MEMCACHED_LOCATION: memcached:11211
+      SECRETS_postgres_password: localtestpg
+      SECRETS_rabbitmq_password: localtestmq
+      SECRETS_redis_password: localtestredis
+      SECRETS_memcached_password: localtestmc
+      ZULIP_ADMIN_EMAIL: owner@example.com
+      ZULIP_ADMIN_PASSWORD: localtestowner123
+      LOADBALANCER_IPS: 100.64.0.0/10,172.16.0.0/12
+    volumes: ["zulip:/data"]
+    depends_on: [postgres, rabbitmq, redis, memcached]
+volumes: {pg: {}, mq: {}, redis: {}, zulip: {}}
