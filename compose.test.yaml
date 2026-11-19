@@ -22,7 +22,7 @@ services:
     build: ./zulip
     ports: ["8080:80"]
     environment:
-      SETTING_EXTERNAL_HOST: localhost:8080
+      SETTING_EXTERNAL_HOST: zulip.local:8080
       SETTING_ZULIP_ADMINISTRATOR: owner@example.com
       SETTING_REMOTE_POSTGRES_HOST: postgres
       SETTING_RABBITMQ_HOST: rabbitmq
