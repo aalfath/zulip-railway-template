@@ -22,10 +22,12 @@ if [ -z "${ZULIP_ADMIN_EMAIL:-}" ] || [ -z "${ZULIP_ADMIN_PASSWORD:-}" ]; then
     exit 0
 fi
 
+# Write first, then hand to the zulip user (the kernel's protected_regular
+# blocks root from opening another user's file in /tmp).
 pwfile="$(mktemp)"
-chown zulip "$pwfile"
 chmod 600 "$pwfile"
 printf '%s' "$ZULIP_ADMIN_PASSWORD" > "$pwfile"
+chown zulip "$pwfile"
 echo "railway: creating organization '${ZULIP_ORG_NAME:-Zulip}' with owner ${ZULIP_ADMIN_EMAIL}"
 if runuser -u zulip -- "$MANAGE" create_realm "${ZULIP_ORG_NAME:-Zulip}" \
     "$ZULIP_ADMIN_EMAIL" "${ZULIP_ADMIN_NAME:-Zulip Owner}" --password-file "$pwfile"; then
